@@ -23,7 +23,25 @@ public final class Filenames {
      * @return the generated unique name.
      */
     public static String generateUniqueName(String originalName, List<String> knownNames) {
-        throw new UnsupportedOperationException("Not implemented.");
+    	if(!knownNames.contains(originalName)){
+    		return originalName;
+    	}
+    	else{
+    		int n=1;
+    		int point = originalName.indexOf(".");
+    		String newName = originalName.substring(0, point)+" ("+n+")"+originalName.substring(point, originalName.length());
+
+    		for(String name:knownNames){
+    			if(name.substring(0, point).equals(originalName.substring(0, point)) 
+    					&& name.substring(name.length()-(originalName.length()-point), name.length()).equals(originalName.substring(point, originalName.length()))
+    					&& !name.equals(originalName)){
+    	    		int number = Integer.parseInt(name.substring(point+2, name.length()-(originalName.length()-point)-1));
+    	    		n=(number>n)? (number+1): n;
+    				newName = originalName.substring(0, point)+" ("+n+")"+originalName.substring(point, originalName.length());
+    			}
+    		} 		
+    		return newName;
+    	}
     }
 
     private Filenames() {

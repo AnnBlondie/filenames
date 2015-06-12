@@ -23,28 +23,73 @@ public final class Filenames {
      * @return the generated unique name.
      */
     public static String generateUniqueName(String originalName, List<String> knownNames) {
-    	if(!knownNames.contains(originalName)){
+    	
+    	if(originalName == null || originalName.isEmpty()){
+    		throw new IllegalArgumentException("file's name is empty");
+    	}
+    	if(knownNames.isEmpty()){
     		return originalName;
     	}
-    	else{
-    		int n=1;
-    		int point = originalName.indexOf(".");
-    		String newName = originalName.substring(0, point)+" ("+n+")"+originalName.substring(point, originalName.length());
-
-    		for(String name:knownNames){
-    			if(name.substring(0, point).equals(originalName.substring(0, point)) 
-    					&& name.substring(name.length()-(originalName.length()-point), name.length()).equals(originalName.substring(point, originalName.length()))
-    					&& !name.equals(originalName)){
-    	    		int number = Integer.parseInt(name.substring(point+2, name.length()-(originalName.length()-point)-1));
-    	    		n=(number>n)? (number+1): n;
-    				newName = originalName.substring(0, point)+" ("+n+")"+originalName.substring(point, originalName.length());
-    			}
-    		} 		
-    		return newName;
-    	}
+   		
+    	String name = getFileName(originalName);
+   		String extention = getFileExtension(originalName);
+   		int number=0;
+   		String newName = originalName;
+   		for(String file:knownNames){
+   			String fileName = getFileName(file);
+   			String fileExtention = getFileExtension(file);
+   			if(name.equals(fileName) && extention.equals(fileExtention)){
+   				if(!file.equals(originalName)){
+   					int filenumber = getFileNumber(file, originalName);
+   					number=(filenumber>number)? (filenumber+1): number;
+   				}
+   				else{
+   					number=1;
+   				}
+   				newName = String.format("%s (%d).%s", name, number, extention);
+   			}
+   		}
+   		return newName;
     }
 
+    public static int getFileNumber(String filename, String originalname){
+    	int number=0;
+    	try{
+    		number=Integer.parseInt(filename.substring(filename.lastIndexOf("(")+1, filename.lastIndexOf(")")));
+    	}
+    	catch (Exception e){
+    		return 0;
+    	}
+		return number;
+    }
+
+    public static String getFileExtension(String filename){
+    	String name="";
+    	try{
+    		name = filename.substring(filename.lastIndexOf(".")+1 );
+    	}
+    	catch (Exception e){
+    		return "";
+    	}
+    	return name;
+    }
+    
+    public static String getFileName(String filename){
+    	String name = "";
+    	try{
+    		if(filename.lastIndexOf("(")==-1){
+    			name = filename.substring(0, filename.lastIndexOf("."));
+    		}
+    		else{
+    			name = filename.substring(0, filename.lastIndexOf(" ("));
+    		}
+    	}
+    	catch (Exception e){
+    		return "";
+    	}
+    	return name;
+    }
+    
     private Filenames() {
     }
-
 }
